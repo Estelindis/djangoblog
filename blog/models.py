@@ -6,6 +6,15 @@ from cloudinary.models import CloudinaryField
 STATUS = ((0, "Draft"), (1, "Published"))
 
 
+class Category(models.Model):
+    category_name = models.CharField(max_length=50, default='Other')
+    category_pic = CloudinaryField('image', default='placeholder')
+    slug = models.SlugField(max_length=200, unique=True)
+
+    def __str__(self):
+        return self.category_name
+
+
 class Post(models.Model):
     title = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
@@ -14,8 +23,13 @@ class Post(models.Model):
     )
     updated_on = models.DateTimeField(auto_now=True)
     content = models.TextField()
+    notes = models.TextField(blank=True)
     featured_image = CloudinaryField('image', default='placeholder')
     excerpt = models.TextField(blank=True)
+    post_category = models.ForeignKey(
+        Category, on_delete=models.PROTECT,
+        default='Other',
+        related_name='post_category')
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=STATUS, default=0)
     likes = models.ManyToManyField(
